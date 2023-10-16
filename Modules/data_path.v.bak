@@ -1,0 +1,29 @@
+module data_path();
+
+ wire [2:0] ALUcontrol;
+ wire [31:0] srcb,srca,ALUresult,PCnext,PC,immext,PCplus4,PCtarget,Ai,Ad,rdi,rdd,data,wd3,rd1,rd2,wd,in1,in2,out;
+ wire PCsrc,sel,reg_wrt,ALUsrc,mem_wrt,result_src,branch,clk,arst,load,zeroflag,signflag,clr,result;
+ wire [1:0] immsrc,ALUop;
+
+program_counter prog_count(.immext(immext), .clk(clk), .arst(arst), .load(load), .PCsrc(PCsrc), .PC(PC), .PCplus4(PCplus4), .PCtarget(PCtarget));
+
+inst_mem instr_mem (.Ai(PC), .rdi(rdi));
+
+register_file reg_file (.wd3(result), .A1(rdi[19:15]), .A2(rdi[24:20]), .A3(rdi[11:7]), .We3(reg_wrt), .clk(clk), .clr(clr), .rd1(srca), .rd2(rd2));
+
+mux Malu(.in1(rd2), .in2(immext), .sel(ALUsrc), .out(srcb));
+
+ALU alu(.ALUcontrol(ALUcontrol), .srca(srca), .srcb(srcb), .ALUresult(ALUresult), .zeroflag(zeroflag), .signflag(signflag));
+
+data_mem mem(.we(mem_wrt), .clk(clk), .Ad(ALUresult), .wd(rd2), .rdd(rdd));
+
+mux Mdata(.in1(ALUresult) , .in2(rdd), .sel(result_src), .out(result));
+
+extend ex(.immsrc(immsrc), .instr(rdi[31:7]), .immext(immext));
+
+ALUdec ALU_dec(.ALUop(ALUop), .fun3(rdi[14:12]), .OP5(rdi[5]), .fun7(rdi[30]), .ALUcontrol(ALUcontrol));
+
+main_dec main(.OP(rdi[6:0]), .fun3(rdi[14:12]), .zeroflag(zeroflag), .reg_wrt(reg_wrt), .ALUsrc(ALUsrc), .immsrc(immsrc), .mem_wrt(mem_wrt), .result_src(result_src), .PCsrc(PCsrc); .ALUop(ALUop));
+
+
+endmodule

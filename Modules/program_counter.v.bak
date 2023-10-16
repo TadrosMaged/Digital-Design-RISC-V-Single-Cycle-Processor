@@ -1,0 +1,13 @@
+module program_counter(
+input [31:0] PCnext,
+input arst,clk,load,
+output reg [31:0] PC
+);
+always@(posedge clk , negedge arst ) begin
+    if(!arst) PC<=0;
+    else begin
+        if(load) PC<=PCnext;
+        else PC<=PC;
+    end
+end
+endmodule 

@@ -1,0 +1,26 @@
+module register_file(
+    input [31:0] wd3,
+    input [0:4]A1,A2,A3,
+    input we3,clk,clr,
+    output [31:0] rd1,
+    output [31:0] rd2
+);
+reg [31:0] data1,data2;
+integer i;
+reg [31:0] mem [0:31];
+
+always@(posedge clk , posedge clr) begin
+if(clr==1) begin
+for(i=0;i<=31;i=i+1) begin
+mem[i]<=0;
+end
+end
+if (we3==1 && clr==0)begin
+mem[A3]<= wd3;
+end
+data1<=mem[A1];
+data2<=mem[A2];
+end 
+assign rd1=data1;
+assign rd2=data2;
+endmodule 

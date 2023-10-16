@@ -1,0 +1,22 @@
+module ALU (
+    input [2:0] ALUcontrol,
+    input[31:0] srca,srcb,
+    output reg [31:0] ALUresult,
+    output reg zeroflag,signflag
+);
+always@(*)
+zeroflag=0;
+signflag=0;
+case(ALUcontrol) begin
+    3'b0:   ALUresult=srca + srcb;
+    3'b1:   ALUresult=srca << srcb;
+    3'b10:  ALUresult=srca - srcb;
+    3'b100: ALUresult=srca ^ srcb;
+    3'b101: ALUresult=srca >> srcb;
+    3'b110: ALUresult=srca | srcb;
+    3'b111: ALUresult=srca & srcb;
+    default: ALUresult=0;
+end
+if(ALUresult==0) zeroflag=1;
+signflag=ALUresult[31];
+endmodule
